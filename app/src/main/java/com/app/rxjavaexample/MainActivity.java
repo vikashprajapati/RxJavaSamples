@@ -13,6 +13,7 @@ import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.ObservableSource;
 import io.reactivex.rxjava3.core.Observer;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.functions.BiFunction;
 import io.reactivex.rxjava3.functions.Function;
@@ -21,11 +22,12 @@ import io.reactivex.rxjava3.observables.ConnectableObservable;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getCanonicalName();
-
+    private CompositeDisposable compositeDisposable;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        compositeDisposable = new CompositeDisposable();
     }
 
     @Override
@@ -280,10 +282,19 @@ public class MainActivity extends AppCompatActivity {
         oddNumbers.concatWith(evenNumbers).subscribe(observer);
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if(!compositeDisposable.isDisposed()){
+            compositeDisposable.dispose();
+        }
+    }
+
     Observer<Integer> observer = new Observer<Integer>() {
         @Override
         public void onSubscribe(@NonNull Disposable d) {
             Log.i(TAG, "onSubscribe: observer");
+            compositeDisposable.add(d);
         }
 
         @Override
@@ -306,6 +317,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onSubscribe(@NonNull Disposable d) {
             Log.i(TAG, "onSubscribe: observer2");
+            compositeDisposable.add(d);
         }
 
         @Override
@@ -327,7 +339,8 @@ public class MainActivity extends AppCompatActivity {
     Observer<String> stringObserver = new Observer<String>() {
         @Override
         public void onSubscribe(@NonNull Disposable d) {
-
+            Log.i(TAG, "onSubscribe: string observer");
+            compositeDisposable.add(d);
         }
 
         @Override
