@@ -50,7 +50,8 @@ public class MainActivity extends AppCompatActivity {
 //        zipWithOperator();
 //        flatMapOperator();
 //        returningObservableFromMap();
-        concatOperator();
+//        concatOperator();
+        doOnError();
     }
 
     private void observableUsingJust() {
@@ -272,14 +273,30 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-    * output:
-    * 1  3 5 7 9 2 4 6 8 10
-    * */
+     * output:
+     * 1  3 5 7 9 2 4 6 8 10
+     * */
     private void concatOperator(){
         Observable<Integer> oddNumbers = Observable.just(1, 3, 5, 7, 9);
         Observable<Integer> evenNumbers = Observable.just(2, 4, 6, 8, 10);
 
         oddNumbers.concatWith(evenNumbers).subscribe(observer);
+    }
+
+    private void doOnError(){
+        Disposable disposable = Observable.error(new Exception("some exception"))
+                .doOnError(throwable -> {
+                    Log.e(TAG, "doOnError: ", throwable);
+                })
+                .subscribe(item -> {
+                    Log.i(TAG, "doOnError: " + item);
+                }, throwable -> {
+                    Log.e(TAG, "doOnError: ", throwable);
+                }, () -> {
+                    Log.i(TAG, "doOnError: ");
+                });
+
+        compositeDisposable.add(disposable);
     }
 
     @Override
