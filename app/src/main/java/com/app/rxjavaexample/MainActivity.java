@@ -51,7 +51,8 @@ public class MainActivity extends AppCompatActivity {
 //        flatMapOperator();
 //        returningObservableFromMap();
 //        concatOperator();
-        doOnError();
+//        doOnError();
+        onErrorReturnItem();
     }
 
     private void observableUsingJust() {
@@ -298,6 +299,15 @@ public class MainActivity extends AppCompatActivity {
 
         compositeDisposable.add(disposable);
     }
+
+
+    private void onErrorReturnItem(){
+        Observable<Integer> observable = Observable.just("14A")
+                .map((Function<String, Integer>) s -> Integer.valueOf(s))
+                .onErrorReturnItem(-1);
+        observable.subscribe(observer);
+    }
+
 
     @Override
     protected void onStop() {
